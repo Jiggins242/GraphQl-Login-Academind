@@ -1,0 +1,24 @@
+{
+  "name": "graphql-login-academind",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jiggins242/GraphQl-Login-Academind.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jiggins242/GraphQl-Login-Academind/issues"
+  },
+  "homepage": "https://github.com/Jiggins242/GraphQl-Login-Academind#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  }
+}
