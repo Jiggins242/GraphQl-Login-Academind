@@ -5,6 +5,7 @@ const { buildSchema } = require('graphql')
 const mongoose = require('mongoose')
 
 const Event = require('./models/event')
+const Patient = require('./models/patient')
 
 const app = express()
 
@@ -49,7 +50,7 @@ app.use('/graphql', graphqlHttp({
 
         type RootQuery {
             events: [Event!]!
-            patient: [Patient!]!
+            patients: [Patient!]!
         }
 
         type RootMutation {
@@ -63,10 +64,41 @@ app.use('/graphql', graphqlHttp({
         }
     `),
     rootValue: { 
+// Root query  for returning all event information 
         events: () => {
-            return events
+            // If we find we no argument we will bring back all documents in Events
+            return Event.find()
+            .then( events => {
+                // We will return all the events from the DB and make them into a new object 
+                // _doc will bring back the core data and remove out the meta data 
+                return events.map( event => {
+                    return {...event._doc, _id: event._doc._id.toString()}
+                })
+            })
+            // if an error
+            .catch(err => {
+                throw err
+            })
+        },
+// Root query  for returning all Patient information 
+        patients: () => {
+            // If we find we no argument we will bring back all documents in the Patients field
+            return Patient.find()
+            .then( patients => {
+                // We will return all the events from the DB and make them into a new object 
+                // _doc will bring back the core data and remove out the meta data 
+                return patients.map( patient => {
+                    return {...patient._doc, _id: patient._doc._id.toString()}
+                })
+            })
+            // if an error
+            .catch(err => {
+                throw err
+            })
         },
 
+
+// Creates and saves the information to the DB for an event
         createEvent: (args) => {
             const event = new Event({
                 title: args.eventInput.title,
@@ -83,6 +115,26 @@ app.use('/graphql', graphqlHttp({
                 throw err
             })
 
+        },
+// Creates and saves the information to the DB for an patient
+        // to allow the grpahql to save to the databsae 
+        createPatient: (args) => {
+            const patient = new Patient({
+                // we take the argument added for title, from the patientinput query 
+                title: args.patientInput.title,
+                forname: args.patientInput.forname,
+                surname: args.patientInput.surname,
+                age: args.patientInput.age
+            })
+            return patient.save()
+            .then( result => {
+                console.log(result)
+                // spread operator (...), allows core documents from mongoose 
+                return { ...result._doc}
+            }).catch( err => {
+                console.log(err)
+                throw err
+            })
         }
     },
     
