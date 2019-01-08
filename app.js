@@ -3,9 +3,11 @@ const bodyParser = require('body-parser')
 const graphqlHttp = require('express-graphql')
 const { buildSchema } = require('graphql')
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
 
 const Event = require('./models/event')
 const Patient = require('./models/patient')
+const User = require('./models/user')
 
 const app = express()
 
@@ -30,6 +32,14 @@ app.use('/graphql', graphqlHttp({
             age: Int!
         }
 
+        type User {
+            _id: ID!
+            username: String!
+            email: String!
+            password: String
+            # Password can be null as we should never want to return the password from the DB to the user 
+        }        
+
         #
         # Input is the required input for the create Mutations
         #
@@ -48,6 +58,12 @@ app.use('/graphql', graphqlHttp({
             age: Int!
         }
 
+        input UserInput {
+            username: String!
+            email: String!
+            password: String!
+        }
+
         type RootQuery {
             events: [Event!]!
             patients: [Patient!]!
@@ -56,6 +72,7 @@ app.use('/graphql', graphqlHttp({
         type RootMutation {
             createEvent(eventInput: EventInput): Event
             createPatient(patientInput: PatientInput): Patient
+            createUser(userInput: UserInput): User
         }
 
         schema {
@@ -64,7 +81,7 @@ app.use('/graphql', graphqlHttp({
         }
     `),
     rootValue: { 
-// Root query  for returning all event information 
+        // Root query  for returning all event information 
         events: () => {
             // If we find we no argument we will bring back all documents in Events
             return Event.find()
@@ -80,7 +97,9 @@ app.use('/graphql', graphqlHttp({
                 throw err
             })
         },
-// Root query  for returning all Patient information 
+
+//=====================================================================================================================================================
+    // Root query  for returning all Patient information 
         patients: () => {
             // If we find we no argument we will bring back all documents in the Patients field
             return Patient.find()
@@ -97,50 +116,123 @@ app.use('/graphql', graphqlHttp({
             })
         },
 
-
-// Creates and saves the information to the DB for an event
+//=====================================================================================================================================================
+    // Creates and saves the information to the DB for an event
         createEvent: (args) => {
             const event = new Event({
                 title: args.eventInput.title,
                 description: args.eventInput.description,
                 price: +args.eventInput.price,
-                date: new Date(args.eventInput.date)
+                date: new Date(args.eventInput.date),
+                // Hard coped in the user for the demo 
+                creator: '5c347b3d11913b3c1c5189c2'
             })
-            return event.save()
+            let createdEvent
+            return event
+            .save()
             .then( result => {
-                console.log(result)
-                return { ...result._doc}
-            }).catch( err => { 
+                createdEvent = {...result._doc, _id: result._doc._id.toString()}
+                // Hard coped in the user for the demo 
+                return User.findById('5c347b3d11913b3c1c5189c2')
+            })
+            .then(user => {
+                if (!user) {
+                    throw new Error('User not found.')
+                }
+                // If found user
+                // the event is updated into the createdEvents section inside the user information 
+                user.createdEvents.push(event)
+                return user.save()
+            })
+            .then(result => {
+                return createdEvent
+            })
+            .catch( err => { 
                 console.log(err)
                 throw err
             })
 
         },
-// Creates and saves the information to the DB for an patient
-        // to allow the grpahql to save to the databsae 
+//=====================================================================================================================================================
+    // Creates and saves the information to the DB for an patient
+    // to allow the grpahql to save to the databsae 
         createPatient: (args) => {
             const patient = new Patient({
                 // we take the argument added for title, from the patientinput query 
                 title: args.patientInput.title,
                 forname: args.patientInput.forname,
                 surname: args.patientInput.surname,
-                age: args.patientInput.age
+                age: args.patientInput.age,
+                // Hard coped in the user for the demo 
+                creator: 'Change me Change me'
             })
-            return patient.save()
+            let createdPatient
+            return patient
+            .save()
             .then( result => {
-                console.log(result)
                 // spread operator (...), allows core documents from mongoose 
-                return { ...result._doc}
-            }).catch( err => {
+                createdPatient = {...result._doc, _id: result._doc._id.toString()}
+                // Hard coped in the user for the demo 
+                return User.findById('Change me Change me')
+            })
+            .then(user => {
+                if (!user) {
+                    throw new Error('User not found.')
+                    }
+                    // If found user
+                    // the event is updated into the createdEvents section inside the user information 
+                    user.createdPatients.push(patient)
+                    return user.save()
+            })
+            .then( result => {
+                return createdPatient
+            })
+            .catch( err => {
                 console.log(err)
                 throw err
             })
+        },
+//=====================================================================================================================================================
+    // Creates and saves the information to the DB for a User
+    // to allow the grpahql to save to the databsae 
+        createUser: (args) => {
+            // Will look to see if the email is already in the DB
+            // If already in the DB will error saying USer already exists
+            // IF not, will carry on the code to create the user
+            return User.findOne({email: args.userInput.email})
+            .then(user => {
+                if (user) {
+                    throw new Error('User exists already.')
+                }
+            // the bcrypt takes in the string of the inputted password
+            // it is then Salted 12 times
+            // 12 is classed as a safe number of times to salt the password
+                return bcrypt
+                .hash(args.userInput.password, 12)
+            })
+            .then(hashedPassword => {
+                const user = new User({
+                    username: args.userInput.username,
+                    email: args.userInput.email,
+                    password: hashedPassword
+                })
+                // Save the created User
+                return user.save()
+            })
+            .then(result => {
+                // password will return as null so can never be sent back even in hash form 
+                return { ...result._doc, password: null, _id: result.id}
+            })
+            .catch(err => {
+                throw err
+            })
+
         }
     },
     
     graphiql: true
     })
-)
+);
 
 // ES6 Promise
 mongoose.Promise = global.Promise;

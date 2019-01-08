@@ -18,6 +18,10 @@ const patientSchema = new Schema ({
     age: {
         type: Number,
         required: true
+        },
+    creator: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
         }
 })
 

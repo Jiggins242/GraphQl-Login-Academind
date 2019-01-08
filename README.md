@@ -1,7 +1,6 @@
 # GraphQl-Login-Academind
 
-## Fire Up the engines {U+1F525}
+## Fire Up the Engines
 
-To start the server. In root folder:
-
-npm start
+To start the server. In root folder: npm start
+To Start the DB : "C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe"
