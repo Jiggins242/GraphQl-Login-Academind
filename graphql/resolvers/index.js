@@ -67,9 +67,12 @@ module.exports = {
             const patients = await Patient.find()
                 // We will return all the events from the DB and make them into a new object 
                 // _doc will bring back the core data and remove out the meta data 
-                return patients.map( patient => {
+                return patients
+                .map( patient => {
                     return {...patient._doc,
-                            _id: patient._doc._id.toString()}
+                            _id: patient._doc._id.toString(),
+                            creator: user.bind( this, patient._doc.creator )
+                        }
                 })
             } catch(err){
             // if an error
@@ -124,7 +127,7 @@ module.exports = {
                 surname: args.patientInput.surname,
                 age: args.patientInput.age,
                 // Hard coped in the user for the demo 
-                creator: 'Change me Change me'
+                creator: '5c347b3d11913b3c1c5189c2'
             })
             let createdPatient
             try {
@@ -134,12 +137,12 @@ module.exports = {
                 createdPatient = {...result._doc, 
                                 _id: result._doc._id.toString()}
                 // Hard coped in the user for the demo 
-                const user = await User.findById('Change me Change me')
+                const user = await User.findById('5c347b3d11913b3c1c5189c2')
                 if (!user) {
                     throw new Error('User not found.')
                     }
                     // If found user
-                    // the event is updated into the createdEvents section inside the user information 
+                    // The event is updated into the createdEvents section inside the user information 
                     user.createdPatients.push(patient)
                     await user.save()
 
@@ -156,8 +159,8 @@ module.exports = {
         createUser: async args => {
             try {
             // Will look to see if the email is already in the DB
-            // If already in the DB will error saying USer already exists
-            // IF not, will carry on the code to create the user
+            // If already in the DB will error saying User already exists
+            // If not, will carry on the code to create the user
             const existingUser = await User.findOne({email: args.userInput.email})
                 if (existingUser) {
                     throw new Error('User exists already.')
