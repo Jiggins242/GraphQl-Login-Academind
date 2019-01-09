@@ -3,7 +3,10 @@ const bcrypt = require('bcryptjs')
 const Event = require('../../models/event')
 const Patient = require('../../models/patient')
 const User = require('../../models/user')
+const Booking = require('../../models/booking')
 
+//=====================================================================================================================================================
+// For all events 
 const events =  async eventIds => {
     try {
     const events = await Event.find({ _id: {$in: eventIds}})
@@ -14,13 +17,46 @@ const events =  async eventIds => {
                     creator: user.bind(this, event.creator)
                 }
             })
-            // line below will need fixing in the future apprently 
+            // line below will need fixing in the future
             return events
         }   catch(err) {
             throw err
     }
 }; 
 
+//=====================================================================================================================================================
+// For single event
+const singleEvent = async eventId => {
+    try{
+        const event = await Event.findById(eventId)
+        return { ...event._doc,
+                id: event.id,
+                creator: user.bind(this, event.creator)}
+
+    } catch(err) {
+        throw err
+    }
+};
+
+//=====================================================================================================================================================
+// For all Patients 
+const patients =  async patientIds => {
+    try {
+    const patients = await Patient.find({ _id: {$in: patientIds}})
+    patients.map(patient => {
+            return { ...patient._doc,
+                    id: patient.id,
+                    creator: user.bind(this, patient.creator)
+                }
+            })
+            // line below will need fixing in the future
+            return patients
+        }   catch(err) {
+            throw err
+    }
+}; 
+
+//=====================================================================================================================================================
 // We are overriding the creator object data
 // To override the _id to the id that mongoose provides so we can read this call back
 const user =  async userId => {
@@ -29,7 +65,8 @@ const user =  async userId => {
         // spread operator (...), allows core documents from mongoose 
         return { ...user._doc, 
                 _id: user.id,
-                createdEvents: events.bind(this, user._doc.createdEvents)
+                createdEvents: events.bind(this, user._doc.createdEvents),
+                createdPatients: patients.bind(this, user._doc.createdPatients)
             }
         } catch(err){
           throw err
@@ -70,7 +107,7 @@ module.exports = {
                 return patients
                 .map( patient => {
                     return {...patient._doc,
-                            _id: patient._doc._id.toString(),
+                            _id: patient._doc._id,
                             creator: user.bind( this, patient._doc.creator )
                         }
                 })
@@ -79,7 +116,25 @@ module.exports = {
                 throw err
             }
         },
-    
+
+//=====================================================================================================================================================
+        bookings: async () => {
+            try{
+                const bookings = await Booking.find()
+                return bookings
+                .map(booking => {
+                    return { ...booking._doc,
+                            _id: booking.id,
+                            user: user.bind(this, booking._doc.user),
+                            event: singleEvent.bind(this, booking._doc.event),
+                            createdAt: new Date(booking._doc.createdAt).toISOString(),
+                            updatedAt: new Date(booking._doc.updatedAt).toISOString()}
+                })
+            } catch (err) {
+                throw err
+            }
+        },
+
 //=====================================================================================================================================================
     // Creates and saves the information to the DB for an event
         createEvent: async args => {
@@ -135,16 +190,17 @@ module.exports = {
             .save()
                 // spread operator (...), allows core documents from mongoose 
                 createdPatient = {...result._doc, 
-                                _id: result._doc._id.toString()}
+                                _id: result._doc._id.toString(),
+                                creator: user.bind(this, result._doc.creator)}
                 // Hard coped in the user for the demo 
-                const user = await User.findById('5c347b3d11913b3c1c5189c2')
-                if (!user) {
+                const creator = await User.findById('5c347b3d11913b3c1c5189c2')
+                if (!creator) {
                     throw new Error('User not found.')
                     }
                     // If found user
                     // The event is updated into the createdEvents section inside the user information 
-                    user.createdPatients.push(patient)
-                    await user.save()
+                    creator.createdPatients.push(patient)
+                    await creator.save()
 
                 return createdPatient
 
@@ -184,5 +240,36 @@ module.exports = {
                 } catch(err) {
                 throw err
             }
-         }
-    }
+         },
+
+//=====================================================================================================================================================
+         bookEvent: async args => {
+             const fetchedevent = await Event.findOne({_id: args.eventId})
+             const booking = new Booking({
+                // Hard coped in the user for the demo 
+                user: '5c347b3d11913b3c1c5189c2',
+                event: fetchedevent
+             })
+             const result = await booking.save()
+             return { ...result._doc,
+                     _id: result.id,
+                     user: user.bind(this, booking._doc.user),
+                     event: singleEvent.bind(this, booking._doc.event),
+                     createdAt: new Date(result._doc.createdAt).toISOString(),
+                     updatedAt: new Date(result._doc.updatedAt).toISOString()}
+         },
+
+//=====================================================================================================================================================
+        cancelBooking: async args => {
+            try{
+                const booking = await Booking.findById(args.bookingId).populate('event')
+                const event = { ...booking.event._doc,
+                                _id: booking.event.id,
+                                creator: user.bind(this, booking.event._doc.creator)}
+                await Booking.deleteOne({_id: args.bookingId})
+                return event 
+            } catch(err) {
+                throw err
+            }
+        }
+}

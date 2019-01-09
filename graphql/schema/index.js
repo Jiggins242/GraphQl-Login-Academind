@@ -2,6 +2,14 @@ const { buildSchema } = require('graphql')
 
 module.exports = buildSchema(`
 
+type Booking {
+    _id: ID!
+    event: Event!
+    user: User!
+    createdAt: String!
+    updatedAt: String!
+}
+
 type Event {
     _id: ID!
     title: String!
@@ -17,6 +25,7 @@ type Patient {
     forname: String!
     surname: String!
     age: Int!
+    creator: User!
 }
 
 type User {
@@ -26,6 +35,7 @@ type User {
     password: String
     # Password can be null as we should never want to return the password from the DB to the user 
     createdEvents: [Event!]
+    createdPatients: [Patient!]
 }        
 
 #
@@ -55,12 +65,15 @@ input UserInput {
 type RootQuery {
     events: [Event!]!
     patients: [Patient!]!
+    bookings: [Booking!]!
 }
 
 type RootMutation {
     createEvent(eventInput: EventInput): Event
     createPatient(patientInput: PatientInput): Patient
     createUser(userInput: UserInput): User
+    bookEvent(eventId: ID!): Booking!
+    cancelBooking(bookingId: ID!): Event!
 }
 
 schema {
