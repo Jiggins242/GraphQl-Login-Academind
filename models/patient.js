@@ -1,3 +1,6 @@
+// These are the mongoDB/ Mongoose schemas for the database
+// These Schemas should be built in the same style of the GraphQl Schemas made but are not the same
+// Is the same as the Patient Schema in GQl (../graphql/schema/index.js)
 const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema

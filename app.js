@@ -11,7 +11,7 @@ const app = express()
 app.use(bodyParser.json())
 
 
-
+// Allows to test the Ql API calls with graphiql
 app.use(
     '/graphql', 
     graphqlHttp({
