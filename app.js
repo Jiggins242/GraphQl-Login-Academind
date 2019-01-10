@@ -5,10 +5,15 @@ const mongoose = require('mongoose')
 
 const graphQlSchema = require('./graphql/schema/index')
 const graphQlResolvers = require('./graphql/resolvers/index')
+const isAuth = require('./middleware/is-auth')
 
 const app = express()
 
 app.use(bodyParser.json())
+
+app.use(isAuth)
+// We can now check every request if isAuth is true or not
+// If we want a request only to be vaild for authorised users add this in 
 
 
 // Allows to test the Ql API calls with graphiql

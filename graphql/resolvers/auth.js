@@ -1,4 +1,6 @@
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
 const User = require('../../models/user')
 
 module.exports = { 
@@ -32,5 +34,27 @@ module.exports = {
             catch(err) {
             throw err
         }
+    },
+
+    login: async ({username, password}) => {
+        // Check to see if the argument is matched in the DB
+        // In this case if the inputted Username matches one  in the DB 
+        const user = await User.findOne({ username: username })
+        if (!user){
+            throw new Error('User does not exist!')
+        }
+        //Compares the plain string password with the hashed password in the DB
+        const isEqual = await bcrypt.compare(password, user.password)
+        if (!isEqual){
+            throw new Error('Password is incorrect!')
+        }
+        // 1st argument is what data we want to store in the token
+        // 2nd is a string to hash the token, required to validate with this private key
+        // 3rd is the time you want the token to expire in
+        const token = jwt.sign({userId: user.id, username: user.username}, 'secretkey', {expiresIn: '1h'})
+        // returns what we stated in the GQl schema for AuthData
+        return {userId: user.id,
+                token: token,
+                tokenExpiration: 1}
     }
-}
+};

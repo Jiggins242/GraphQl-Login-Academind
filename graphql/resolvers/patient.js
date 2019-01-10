@@ -4,7 +4,11 @@ const { transformPatient } = require('./merge')
 
 module.exports = { 
 // Root query  for returning all Patient information 
-    patients: async () => {
+    patients: async (args, req) => {
+        // Checks to see if we are authenticated to allow us to create an event
+        if (!req.isAuth){
+            throw new Error('Unauthenticated!')
+        }
         try{
         // If we find we no argument we will bring back all documents in the Patients field
         const patients = await Patient.find()
@@ -23,15 +27,19 @@ module.exports = {
 
 // Creates and saves the information to the DB for an patient
 // to allow the grpahql to save to the databsae 
-    createPatient: async args => {
+    createPatient: async (args, req) => {
+        // Checks to see if we are authenticated to allow us to create an event
+        if (!req.isAuth){
+            throw new Error('Unauthenticated!')
+        }
         const patient = new Patient({
             // we take the argument added for title, from the patientinput query 
             title: args.patientInput.title,
             forname: args.patientInput.forname,
             surname: args.patientInput.surname,
             age: args.patientInput.age,
-            // Hard coped in the user for the demo 
-            creator: '5c347b3d11913b3c1c5189c2'
+            // We get the user ID from the token in the request now
+            creator: req.userId
         })
             let createdPatient
             try {
@@ -39,8 +47,8 @@ module.exports = {
             .save()
             // spread operator (...), allows core documents from mongoose 
             createdPatient = transformPatient(result)
-            // Hard coped in the user for the demo 
-            const creator = await User.findById('5c347b3d11913b3c1c5189c2')
+            // We get the user ID from the token in the request now
+            const creator = await User.findById(req.userId)
             if (!creator) {
                 throw new Error('User not found.')
                 }

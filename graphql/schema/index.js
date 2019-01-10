@@ -36,7 +36,13 @@ type User {
     # Password can be null as we should never want to return the password from the DB to the user 
     createdEvents: [Event!]
     createdPatients: [Patient!]
-}        
+}
+
+type AuthData {
+    userId: ID!
+    token: String!
+    tokenExpiration: Int!
+}
 
 #
 # Input is the required input for the create Mutations
@@ -66,6 +72,7 @@ type RootQuery {
     events: [Event!]!
     patients: [Patient!]!
     bookings: [Booking!]!
+    login(username: String!, password: String!): AuthData!
 }
 
 type RootMutation {
