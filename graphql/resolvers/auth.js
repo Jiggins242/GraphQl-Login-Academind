@@ -11,7 +11,7 @@ module.exports = {
         // Will look to see if the email is already in the DB
         // If already in the DB will error saying User already exists
         // If not, will carry on the code to create the user
-        const existingUser = await User.findOne({email: args.userInput.email})
+        const existingUser = await User.findOne({username: args.userInput.username})
             if (existingUser) {
                 throw new Error('User exists already.')
             }
@@ -21,7 +21,7 @@ module.exports = {
         const hashedPassword = await bcrypt.hash(args.userInput.password, 12)
             const user = new User({
                 username: args.userInput.username,
-                email: args.userInput.email,
+              //  email: args.userInput.email,
                 password: hashedPassword
             })
         // Save the created User

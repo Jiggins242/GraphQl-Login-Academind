@@ -11,6 +11,18 @@ const app = express()
 
 app.use(bodyParser.json())
 
+// To allow the API request to span accross multiple servers 
+// From my React front end to my localhost server for the DB connection 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
 app.use(isAuth)
 // We can now check every request if isAuth is true or not
 // If we want a request only to be vaild for authorised users add this in 
@@ -34,8 +46,8 @@ mongoose.Promise = global.Promise;
     mongoose.connect(`mongodb://127.0.0.1:27017/emisdatabase`, {useNewUrlParser: true})
     .then(() => {
         console.log('--- Connected to Database ---')
-        app.listen(3000)
-        console.log('--- Listening to port 3000 ---')
+        app.listen(8000)
+        console.log('--- Listening to port 8000 ---')
     }).catch(err => {
         console.log(err)
     })

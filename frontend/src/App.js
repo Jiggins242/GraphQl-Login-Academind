@@ -9,7 +9,6 @@ import MainNavigation from './components/Navigation/MainNavigation'
 
 import './styles/App.css';
 
-
 class App extends Component {
   render() {
     return (

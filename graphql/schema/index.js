@@ -31,7 +31,6 @@ type Patient {
 type User {
     _id: ID!
     username: String!
-    email: String!
     password: String
     # Password can be null as we should never want to return the password from the DB to the user 
     createdEvents: [Event!]
@@ -64,7 +63,6 @@ input PatientInput {
 
 input UserInput {
     username: String!
-    email: String!
     password: String!
 }
 
