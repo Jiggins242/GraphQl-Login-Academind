@@ -34,7 +34,8 @@ class AuthPage extends Component {
         // If nothing just return
         return
       }
-
+      // If we are on the login section 
+      // We will use this mutation to login 
       let requestBody = {
         query:`
           query {
@@ -46,7 +47,8 @@ class AuthPage extends Component {
           }
         `
       }
-
+      // If we are not on the Login function 
+      // We will use this mutation instead, this will create a user
       if (!this.state.isLogin) {
          requestBody = {
           query: `

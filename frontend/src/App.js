@@ -2,10 +2,12 @@ import React, { Component } from 'react'
 import {BrowserRouter, Route, Redirect, Switch} from 'react-router-dom'
 
 import AuthPage from './pages/Auth'
-import PatientsPage from './pages/Patients';
-import EventsPage from './pages/Events';
-import BookingPage from './pages/Bookings';
+import PatientsPage from './pages/Patients'
+import EventsPage from './pages/Events'
+import BookingPage from './pages/Bookings'
 import MainNavigation from './components/Navigation/MainNavigation'
+
+import UserPage from './pages/User'
 
 import './styles/App.css';
 
@@ -22,6 +24,7 @@ class App extends Component {
               <Route path="/patients" component={PatientsPage} />
               <Route path="/events" component={EventsPage} />
               <Route path="/bookings" component={BookingPage} />
+              <Route path="/user" component={UserPage} />
             </Switch>
           </main>
         </React.Fragment>
