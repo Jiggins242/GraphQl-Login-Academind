@@ -37,6 +37,7 @@ type User {
     createdPatients: [Patient!]
 }
 
+
 type AuthData {
     userId: ID!
     token: String!
@@ -71,6 +72,7 @@ type RootQuery {
     patients: [Patient!]!
     bookings: [Booking!]!
     login(username: String!, password: String!): AuthData!
+    me: User
 }
 
 type RootMutation {

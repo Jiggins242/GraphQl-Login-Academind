@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import AuthContext from '../context/auth-context'
 
 import '../styles/Auth.css'
 
@@ -8,6 +9,9 @@ class AuthPage extends Component {
   state = {
     isLogin: true
   }
+
+// React behind the scenes will conect up the logic of the two 
+  static contextType = AuthContext
 
 //Using React Refrences to fetch the API requests
   constructor(props) {
@@ -56,6 +60,10 @@ class AuthPage extends Component {
             createUser(userInput: {username:"${username}", password:"${password}"}){
               _id
               username
+              user{
+                id
+                forn
+              }
             }
           }
           `
@@ -76,7 +84,9 @@ class AuthPage extends Component {
         return res.json()
       })
       .then(resData => {
-        console.log(resData)
+        if (resData.data.login.token) {
+          this.context.login(resData.data.login.token, resData.data.login.userId, resData.data.login.tokenExpiration)
+        }
       })
       .catch(err => {
         console.log(err)
