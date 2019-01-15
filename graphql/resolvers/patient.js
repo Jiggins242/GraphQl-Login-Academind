@@ -6,9 +6,9 @@ module.exports = {
 // Root query  for returning all Patient information 
     patients: async (args, req) => {
         // Checks to see if we are authenticated to allow us to create an event
-        if (!req.isAuth){
-            throw new Error('Unauthenticated!')
-        }
+        //if (!req.isAuth){
+         //   throw new Error('Unauthenticated!')
+       // }
         try{
         // If we find we no argument we will bring back all documents in the Patients field
         const patients = await Patient.find()
@@ -29,13 +29,13 @@ module.exports = {
 // to allow the grpahql to save to the databsae 
     createPatient: async (args, req) => {
         // Checks to see if we are authenticated to allow us to create an event
-        if (!req.isAuth){
-            throw new Error('Unauthenticated!')
-        }
+        //if (!req.isAuth){
+         //   throw new Error('Unauthenticated!')
+        //}
         const patient = new Patient({
             // we take the argument added for title, from the patientinput query 
             title: args.patientInput.title,
-            forname: args.patientInput.forname,
+            forename: args.patientInput.forename,
             surname: args.patientInput.surname,
             age: args.patientInput.age,
             // We get the user ID from the token in the request now

@@ -22,7 +22,7 @@ type Event {
 type Patient {
     _id: ID!
     title: String!
-    forname: String!
+    forename: String!
     surname: String!
     age: Int!
     creator: User!
@@ -57,7 +57,7 @@ input EventInput {
 
 input PatientInput {
     title: String!
-    forname: String!
+    forename: String!
     surname: String!
     age: Int!
 }
@@ -72,7 +72,6 @@ type RootQuery {
     patients: [Patient!]!
     bookings: [Booking!]!
     login(username: String!, password: String!): AuthData!
-    me: User
 }
 
 type RootMutation {

@@ -10,7 +10,7 @@ const patientSchema = new Schema ({
          type: String,
          required: true
          },
-    forname: {
+    forename: {
         type: String,
         required: true
         },
