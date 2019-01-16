@@ -11,28 +11,10 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    /*
-    email: {
-        type: String,
-        required: true
-    },
-    */
     password: {
         type: String,
         required: true
-    },
-    // might not be needed yet for my work
-    // will connect what hs been created with the user logged in 
-    createdPatients: [
-        {
-        type: Schema.Types.ObjectId,
-        ref: 'Patient'
-    }],
-    createdEvents: [
-        {
-        type: Schema.Types.ObjectId,
-        ref: 'Event'
-    }],
+    }
 })
 
 module.exports = mongoose.model('User',userSchema)

@@ -3,20 +3,16 @@ const { transformPatient } = require('./merge')
 
 
 module.exports = { 
-// Root query  for returning all Patient information 
-    patients: async (args, req) => {
-        // Checks to see if we are authenticated to allow us to create an event
-        //if (!req.isAuth){
-         //   throw new Error('Unauthenticated!')
-       // }
+listAllPatients: async (args, req) => {
         try{
         // If we find we no argument we will bring back all documents in the Patients field
         const patients = await Patient.find()
             // We will return all the events from the DB and make them into a new object 
             // _doc will bring back the core data and remove out the meta data 
-            return patients
-            .map( patient => {
-                return transformPatient(patient)
+            return patients.map( patient => {
+                return {
+                    ...patient._doc,
+                    _id: patient.id}
                 })
             } 
             catch(err){
@@ -25,6 +21,36 @@ module.exports = {
         }
     },
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 // Creates and saves the information to the DB for an patient
 // to allow the grpahql to save to the databsae 
     createPatient: async (args, req) => {
@@ -62,5 +88,5 @@ module.exports = {
             console.log(err)
             throw err
         }
-    }
+    }*/
 }

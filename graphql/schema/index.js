@@ -2,22 +2,26 @@ const { buildSchema } = require('graphql')
 
 module.exports = buildSchema(`
 
-type Booking {
-    _id: ID!
-    event: Event!
-    user: User!
-    createdAt: String!
-    updatedAt: String!
+schema {
+    query: RootQuery
+    mutation: RootMutation
 }
 
-type Event {
-    _id: ID!
-    title: String!
-    description: String!
-    price: Float!
-    date: String!
-    creator: User!
+type RootQuery {
+    listAllPatients: [Patient!]!
+    login(username: String!, password: String!): AuthData!
 }
+
+type RootMutation {
+    createPatient(patientInput: PatientInput): Patient
+    createUser(userInput: UserInput): User
+}
+
+##################################################################################
+##################################################################################
+#
+# The Types: 
+#
 
 type Patient {
     _id: ID!
@@ -25,7 +29,6 @@ type Patient {
     forename: String!
     surname: String!
     age: Int!
-    creator: User!
 }
 
 type User {
@@ -33,10 +36,7 @@ type User {
     username: String!
     password: String
     # Password can be null as we should never want to return the password from the DB to the user 
-    createdEvents: [Event!]
-    createdPatients: [Patient!]
 }
-
 
 type AuthData {
     userId: ID!
@@ -44,16 +44,11 @@ type AuthData {
     tokenExpiration: Int!
 }
 
+##################################################################################
+##################################################################################
 #
 # Input is the required input for the create Mutations
 #
-
-input EventInput {
-    title: String!
-    description: String!
-    price: Float!
-    date: String!
-}
 
 input PatientInput {
     title: String!
@@ -65,25 +60,5 @@ input PatientInput {
 input UserInput {
     username: String!
     password: String!
-}
-
-type RootQuery {
-    events: [Event!]!
-    patients: [Patient!]!
-    bookings: [Booking!]!
-    login(username: String!, password: String!): AuthData!
-}
-
-type RootMutation {
-    createEvent(eventInput: EventInput): Event
-    createPatient(patientInput: PatientInput): Patient
-    createUser(userInput: UserInput): User
-    bookEvent(eventId: ID!): Booking!
-    cancelBooking(bookingId: ID!): Event!
-}
-
-schema {
-    query: RootQuery
-    mutation: RootMutation
 }
 `)

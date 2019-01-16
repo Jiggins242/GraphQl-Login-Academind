@@ -1,0 +1,9 @@
+var patientsDb = [
+    {id:'1', title:'Mr', forename:'Homer', surname:'Simpson', age:39, doctorId:'2'},
+    {id:'2', title:'Mrs', forename:'Marjorie', surname:'Simpson', age:37, doctorId:'1'},
+    {id:'3', title:'Ms', forename:'Bart', surname:'Simpson', age:9, doctorId:'2'},
+    {id:'4', title:'Miss', forename:'Lisa', surname:'Simpson', age:8, doctorId:'1'}
+];
+var doctorsDb = [
+    {id:'1', title:'Dr', forename:'Julius', surname:'Hibbert', jobrole:'Doctor', age:45, username:'Hibbert92', email:'J.Hibbert@Springfield.com'},
+    {id:'2', title:'Dr', forename:'Nick', surname:'Riviera', jobrole:'Doctor', age:35, username:'HiDrNick', email:'N.Riviera@Springfield.com'},
