@@ -1,8 +1,8 @@
 const graphql = require ('graphql')
 const _ = require('lodash')
 
-const patient = require('../../models/patient')
-const doctor = require('../../models/doctor')
+const Patient = require('../../models/patient')
+const Doctor = require('../../models/doctor')
 
 const { GraphQLObjectType, 
         GraphQLString,
@@ -118,11 +118,30 @@ const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: { 
         addPatient: {
-            type: 
+            // We need to pass in the arguments to GQL to make a patient
+            type: PatientType,
+            args: {
+                title: { type: GraphQLString },
+                forename: { type: GraphQLString },
+                surname: { type: GraphQLString },
+                age:  { type: GraphQLInt }
+            },
+            // Those arguments go to the required space
+            resolve(parent, args){
+                let patient = new Patient({
+                    title: args.title,
+                    forename: args.forename,
+                    surname: args.surname,
+                    age: args.age
+                })
+                // Mongoose saves to the DB and return it
+                return patient.save()
+            }
         }
     }
 })
 
 module.exports = new GraphQLSchema({
-    query:RootQuery
+    query:RootQuery,
+    mutation: Mutation
 })
