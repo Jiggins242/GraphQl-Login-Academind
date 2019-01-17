@@ -10,14 +10,13 @@ const AllPatients_QUERY = gql`
       surname
       forename
       age
+      
     }
   }
 `
 
 
 class PatientList extends Component {
-
-  
 
     displayPatients(){
       // Comes into the browser as "data" property
@@ -31,14 +30,15 @@ class PatientList extends Component {
         else {
             return data.allPatients.map(patient => {
                 return(
-                <div> {patient.title} {patient.surname} {patient.forename}</div>
+                <div> {patient.title} {patient.surname} {patient.forename} {patient.age}</div>
                 )
             }) 
         }
     }
 
   render() {
-        console.log(this.props)
+    // Is here for debugging issues
+    console.log(this.props)
     return (
       <div> 
         <ul id="patient-list">
@@ -50,3 +50,8 @@ class PatientList extends Component {
 }
 //Binds the query to the componet
 export default graphql(AllPatients_QUERY) (PatientList)
+
+
+/*
+{patient.doctor.forename} {patient.doctor.surname}
+*/
