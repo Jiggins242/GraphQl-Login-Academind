@@ -13,6 +13,7 @@ const app = express()
 
 app.use(bodyParser.json())
 
+// Allows cross-origin requests
 app.use(cors())
 
 // To allow the API request to span accross multiple servers 

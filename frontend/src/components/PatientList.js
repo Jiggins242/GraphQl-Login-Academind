@@ -3,12 +3,12 @@ import React, { Component } from 'react'
 import { gql } from 'apollo-boost'
 import { graphql } from 'react-apollo'
 
-const GETALLPATIENT_QUERY = gql`
+const AllPatients_QUERY = gql`
 {
-    patients {
+    allPatients {
       title
-      forename
       surname
+      forename
       age
     }
   }
@@ -17,7 +17,10 @@ const GETALLPATIENT_QUERY = gql`
 
 class PatientList extends Component {
 
+  
+
     displayPatients(){
+      // Comes into the browser as "data" property
         var data = this.props.data
         if(data.loading){
             return(<div>Rome was not built in a day...</div>)
@@ -26,23 +29,24 @@ class PatientList extends Component {
             return(<div>Ops we broke it</div>)
         } 
         else {
-            return data.patients.map(patient => {
+            return data.allPatients.map(patient => {
                 return(
-                <div>{patient.forename} {patient.surname}</div>
+                <div> {patient.title} {patient.surname} {patient.forename}</div>
                 )
-            })
+            }) 
         }
     }
 
   render() {
+        console.log(this.props)
     return (
       <div> 
         <ul id="patient-list">
-          { this.displayPatients()}
+        { this.displayPatients()}
         </ul>
       </div>
-    )
-  }
+    ) 
+  } 
 }
 //Binds the query to the componet
-export default graphql(GETALLPATIENT_QUERY) (PatientList)
+export default graphql(AllPatients_QUERY) (PatientList)

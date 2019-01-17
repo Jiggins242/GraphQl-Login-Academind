@@ -22,7 +22,11 @@ const patientSchema = new Schema ({
     age: {
         type: Number,
         required: true
-        }
+        },
+    doctorId: {
+        type: String,
+        required: true
+    }
 })
 
 module.exports = mongoose.model('Patient',patientSchema)

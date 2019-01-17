@@ -9,6 +9,7 @@ const { GraphQLObjectType,
         GraphQLInt,
         GraphQLID,
         GraphQLList,
+        GraphQLNonNull,
         GraphQLSchema } = graphql
 
 // Define Schema types 
@@ -32,9 +33,9 @@ const PatientType = new GraphQLObjectType({
         doctor: {
             type: DoctorType,
             // The parent is all the info in the above type  (Patient)
-            // We check to see if the DoctorId matches the id: from the doctor 
+            // We check to see if the DoctorId matches the id: from the doctor in the doctor DB 
             resolve(parent, args){
-                //return _.find(doctorsDb, {id: parent.doctorId})
+                return Doctor.findById(parent.doctorId)
             }
         }
     })
@@ -58,7 +59,7 @@ const DoctorType = new GraphQLObjectType({
             resolve(parent, args){
                 // We look through the patients DB to match any doctorId with the Doctors ID
                 // If not mataching it filters it out of the array 
-                //return _.filter(patientsDb, {doctorId: parent.id})
+                return Patient.find({doctorId: parent.id})
             }
         }
     })
@@ -79,7 +80,7 @@ const RootQuery = new GraphQLObjectType({
                 // The Resolve will get the result from our DB
                 // lodash looks through the DB/ array
                 // Finds any book matching the same ID from the inputted args
-                //return _.find(patientsDb, {id: args.id})
+                return Patient.findById(args.id)
             }
         },
 
@@ -87,7 +88,7 @@ const RootQuery = new GraphQLObjectType({
             type: DoctorType,
             args: { id: {type: GraphQLID}},
             resolve(parent, args){
-                return _.find(doctorsDb, {id: args.id})
+                return Doctor.findById(args.id)
             }
         },
 
@@ -96,15 +97,15 @@ const RootQuery = new GraphQLObjectType({
             // As the relationship is already stated with Patients and Dr we can still access both types 
             type: new GraphQLList(PatientType),
             resolve(parent, args){
-                // we return all the information from the DB
-                //return patientsDb
+                // We return all the information from the DB
+                return Patient.find({})
             }
         },
 
         allDoctors: {
             type: new GraphQLList(DoctorType),
             resolve(parent, args){
-                //return doctorsDb
+                return Doctor.find({})
             }
         },
     }
@@ -116,15 +117,17 @@ const RootQuery = new GraphQLObjectType({
 
 const Mutation = new GraphQLObjectType({
     name: 'Mutation',
-    fields: { 
+    fields: {
+        // Create a patient to DB
         addPatient: {
             // We need to pass in the arguments to GQL to make a patient
             type: PatientType,
             args: {
-                title: { type: GraphQLString },
-                forename: { type: GraphQLString },
-                surname: { type: GraphQLString },
-                age:  { type: GraphQLInt }
+                title: { type: new GraphQLNonNull (GraphQLString) },
+                forename: { type: new GraphQLNonNull (GraphQLString) },
+                surname: { type: new GraphQLNonNull (GraphQLString) },
+                age:  { type: new GraphQLNonNull (GraphQLInt) },
+                doctorId: { type: new GraphQLNonNull (GraphQLID) }
             },
             // Those arguments go to the required space
             resolve(parent, args){
@@ -132,12 +135,39 @@ const Mutation = new GraphQLObjectType({
                     title: args.title,
                     forename: args.forename,
                     surname: args.surname,
-                    age: args.age
+                    age: args.age,
+                    doctorId: args.doctorId
                 })
                 // Mongoose saves to the DB and return it
                 return patient.save()
             }
-        }
+        },
+
+        // Create a doctor to DB
+        addDoctor: {
+            type: DoctorType,
+            args: {
+                title: { type: new GraphQLNonNull (GraphQLString) },
+                forename: { type: new GraphQLNonNull (GraphQLString) },
+                surname: { type: new GraphQLNonNull (GraphQLString) },
+                jobrole: { type: new GraphQLNonNull (GraphQLString) },
+                age:  { type: new GraphQLNonNull (GraphQLInt) },
+                username: { type: new GraphQLNonNull (GraphQLString) },
+                email: { type: new GraphQLNonNull (GraphQLString) }
+            },
+            resolve(parent, args){
+                let doctor = new Doctor({
+                    title: args.title,
+                    forename: args.forename,
+                    surname: args.surname,
+                    jobrole: args.jobrole,
+                    age: args.age,
+                    username: args.username,
+                    email: args.email
+                })
+                return doctor.save()
+            }
+        }   
     }
 })
 

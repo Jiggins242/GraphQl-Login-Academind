@@ -3,6 +3,12 @@ var patientsDb = [
     {id:'2', title:'Mrs', forename:'Marjorie', surname:'Simpson', age:37, doctorId:'1'},
     {id:'3', title:'Ms', forename:'Bart', surname:'Simpson', age:9, doctorId:'2'},
     {id:'4', title:'Miss', forename:'Lisa', surname:'Simpson', age:8, doctorId:'1'}
+    Miss Maggie Simpson 1
+    Mr Ned Flanders 60
+    Mr Kirk Van Houten 39
+    Ms Milhouse Van Houten 10
+
+
 ];
 var doctorsDb = [
     {id:'1', title:'Dr', forename:'Julius', surname:'Hibbert', jobrole:'Doctor', age:45, username:'Hibbert92', email:'J.Hibbert@Springfield.com'},
